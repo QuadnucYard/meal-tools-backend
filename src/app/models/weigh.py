@@ -28,7 +28,7 @@ class Weigh(Base):
 
     @record_date.setter
     def record_date(self, date: date):
-        self._record_date = datetime.combine(date, datetime.min.time())
+        self._record_date = datetime(date.year, date.month, date.day)
 
 
 __all__ = ["Weigh"]

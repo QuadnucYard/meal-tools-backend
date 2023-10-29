@@ -1,5 +1,5 @@
 import json
-from sqlalchemy import String
+
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base, int_pk
@@ -9,6 +9,7 @@ class Canteen(Base):
     id: Mapped[int_pk]
     name: Mapped[str]
     _aliases: Mapped[str] = mapped_column("aliases")
+    desc: Mapped[str]
 
     @property
     def aliases(self) -> list[str]:
