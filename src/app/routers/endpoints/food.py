@@ -21,3 +21,11 @@ async def add_food(
     db: AsyncSession = Depends(deps.get_db),
 ):
     return await crud.food.create(db, body)
+
+
+@router.get("/rec", response_model=list[FoodRead])
+async def get_recommendations(
+    db: AsyncSession = Depends(deps.get_db),
+    limit: int = 10,
+):
+    return await crud.weigh.get_recent_foods(db, limit=limit)
