@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
+from app.db.utils import from_orm_async
 from app.models.food import Food
 from app.routers import deps
-from app.schemas.food import FoodCreate, FoodRead, FoodUpdate
+from app.schemas.food import FoodCreate, FoodRead, FoodReadWithVariants, FoodUpdate
 
 router = APIRouter()
 
@@ -19,11 +20,12 @@ async def dep_get_food(
     return food
 
 
-@router.get("/", response_model=list[FoodRead])
+@router.get("/", response_model=list[FoodReadWithVariants])
 async def get_foods(
     db: AsyncSession = Depends(deps.get_db),
 ):
-    return await crud.food.get_many(db, limit=10000)
+    foods = await crud.food.get_many(db, limit=10000)
+    return await from_orm_async(db, FoodReadWithVariants, foods)
 
 
 @router.post("/", response_model=FoodRead)

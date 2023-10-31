@@ -1,10 +1,9 @@
-import asyncio
 from typing import Any, Type, TypeVar, overload
 
 from pydantic import BaseModel
 
+from app.db.session import AsyncEngine, AsyncSession
 from app.models.base import Base
-from .session import AsyncSession, AsyncEngine
 
 SchemaType = TypeVar("SchemaType", bound=BaseModel)
 ModelType = TypeVar("ModelType", bound=Base)
@@ -34,7 +33,7 @@ async def from_orm_async(
     update: dict[str, Any] | None = None,
 ) -> SchemaType | list[SchemaType]:
     if isinstance(obj, list):
-        return await asyncio.gather(*[from_orm_async(db, model, obj_) for obj_ in obj])
+        return await db.run_sync(lambda _: [model.model_validate(obj_) for obj_ in obj])
     else:
         return await db.run_sync(lambda _: model.model_validate(obj))
 
