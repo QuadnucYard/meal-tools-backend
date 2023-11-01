@@ -8,12 +8,12 @@ from .base import OrmModel
 
 
 class FoodBase(OrmModel):
-    parent_id: int | None
+    parent_id: int | None = None
     name: str
     aliases: list[str]
     price: int
     desc: str
-    image: str | None
+    image: str | None = None
 
 
 class FoodCreate(FoodBase):
