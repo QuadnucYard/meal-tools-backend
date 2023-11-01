@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timezone
+
+from pydantic import field_validator
 
 from .base import OrmModel
 
@@ -19,6 +21,10 @@ class WeighCreate(WeighBase):
 class WeighRead(WeighBase):
     id: int
     create_time: datetime
+
+    @field_validator("create_time")
+    def validate_create_time(cls, v: datetime):
+        return v.replace(tzinfo=timezone.utc)
 
 
 class WeighUpdate(OrmModel):

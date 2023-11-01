@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
+
+from pydantic import field_validator
 
 from .base import OrmModel
 
@@ -21,6 +23,10 @@ class FoodCreate(FoodBase):
 class FoodRead(FoodBase):
     id: int
     create_time: datetime
+
+    @field_validator("create_time")
+    def validate_create_time(cls, v: datetime):
+        return v.replace(tzinfo=timezone.utc)
 
 
 class FoodReadWithVariants(FoodRead):
