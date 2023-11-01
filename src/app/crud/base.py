@@ -105,17 +105,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_objs
 
     async def create(self, db: AsyncSession, obj_in: CreateSchemaType) -> ModelType:
-        obj_in_data = jsonable_encoder(obj_in)
+        # obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in.model_dump())
         return await self.add(db, db_obj)
 
     async def update(
         self, db: AsyncSession, *, db_obj: ModelType, obj_in: UpdateSchemaType | dict[str, Any]
     ) -> ModelType:
-        obj_data = jsonable_encoder(db_obj)
+        # obj_data = jsonable_encoder(db_obj)
         update_data = obj_in if isinstance(obj_in, dict) else obj_in.model_dump(exclude_unset=True, exclude_none=True)
-        for field in obj_data:
-            if field in update_data:
+        for field in update_data:
+            if hasattr(db_obj, field):
                 setattr(db_obj, field, update_data[field])
         return await self.add(db, db_obj)
 
