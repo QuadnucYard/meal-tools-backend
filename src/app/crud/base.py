@@ -3,9 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Generic, Sequence, Type, TypedDict, TypeVar
 
 from fastapi import HTTPException
-from fastapi.encoders import jsonable_encoder
 from fastapi_pagination import Page
-from fastapi_pagination.ext.async_sqlalchemy import paginate
+from fastapi_pagination.ext.sqlalchemy import paginate
 from fastapi_pagination.types import AsyncItemsTransformer
 from pydantic import BaseModel
 from sqlalchemy import desc, select
