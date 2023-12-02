@@ -32,6 +32,8 @@ class FoodRead(FoodBase):
 class FoodReadWithVariants(FoodRead):
     variants: list[FoodReadWithVariants]
 
+class FoodReadWithWeight(FoodReadWithVariants):
+    avg_weight: float
 
 class FoodUpdate(OrmModel):
     name: str | None = None
@@ -41,4 +43,4 @@ class FoodUpdate(OrmModel):
     image: str | None = None
 
 
-__all__ = ["FoodCreate", "FoodRead", "FoodReadWithVariants", "FoodUpdate"]
+__all__ = ["FoodCreate", "FoodRead", "FoodReadWithVariants", "FoodReadWithWeight", "FoodUpdate"]
