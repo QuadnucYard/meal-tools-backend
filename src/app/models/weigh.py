@@ -4,20 +4,20 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base, datetime_def, int_pk
+from .base import Base, TimeMixin, int_pk
 
 if TYPE_CHECKING:
     from .canteen import Canteen
     from .food import Food
 
 
-class Weigh(Base):
+class Weigh(TimeMixin, Base):
     id: Mapped[int_pk]
     canteen_id: Mapped[int] = mapped_column(ForeignKey("canteen.id"), default=None)
     food_id: Mapped[int] = mapped_column(ForeignKey("food.id"), default=None)
     weight: Mapped[float]
     _record_date: Mapped[datetime] = mapped_column("record_date")
-    create_time: Mapped[datetime_def]
+    image: Mapped[str | None] = mapped_column(default=None)
 
     canteen: Mapped["Canteen"] = relationship()
     food: Mapped["Food"] = relationship()
