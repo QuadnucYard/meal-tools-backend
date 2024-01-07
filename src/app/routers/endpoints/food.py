@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import crud
 from app.models.food import Food
 from app.routers import deps
-from app.schemas.food import FoodCreate, FoodRead, FoodReadWithVariants, FoodReadWithWeight, FoodUpdate
+from app.schemas.food import FoodCreate, FoodRead, FoodReadWithStats, FoodReadWithVariants, FoodUpdate
 
 router = APIRouter()
 
@@ -19,14 +19,19 @@ async def dep_get_food(
     return food
 
 
-@router.get("/", response_model=list[FoodReadWithWeight])
+@router.get("/", response_model=list[FoodReadWithStats])
 async def get_foods(
     db: AsyncSession = Depends(deps.get_db),
 ):
     rows = await crud.food.get_with_weight(db)
     return await db.run_sync(
         lambda _: [
-            FoodReadWithWeight(**FoodReadWithVariants.model_validate(row[0]).model_dump(), avg_weight=row[1])
+            FoodReadWithStats(
+                **FoodReadWithVariants.model_validate(row[0]).model_dump(),
+                weight_cnt=row[1],
+                weight_avg=row[2],
+                weight_std=row[3],
+            )
             for row in rows
         ]
     )
