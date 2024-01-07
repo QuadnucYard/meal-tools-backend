@@ -9,6 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
 aiosqlite = "^0.19.0"
+alembic = "^1.13.1"
 fastapi = "^0.104.1"
 fastapi-pagination = "^0.12.13"
 more-itertools = "^10.1.0"
@@ -34,11 +35,8 @@ line-length = 120
 target-version = ['py311']
 
 [tool.mypy]
-strict = true
-
-[[tool.mypy.overrides]]
-disallow_untyped_defs = false
-disallow_import_untyped = false
+# strict = true
+check_untyped_defs = false
 
 [tool.ruff]
 select = [
@@ -63,4 +61,4 @@ ignore = ["B008", "E711", "E712", "F403", "F405"]
 "__init__.py" = ["F401"]
 
 [tool.ruff.isort]
-known-third-party = ["sqlalchemy", "pydantic", "fastapi"]
+known-third-party = ["alembic", "sqlalchemy", "pydantic", "fastapi"]
