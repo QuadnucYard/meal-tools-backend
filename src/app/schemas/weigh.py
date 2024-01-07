@@ -10,15 +10,15 @@ class WeighBase(OrmModel):
     food_id: int
     weight: int
     record_date: date
-    image: str | None
 
 
 class WeighCreate(WeighBase):
-    ...
+    image: str | None = None
 
 
 class WeighRead(WeighBase, TimeMixin):
     id: int
+    image: str | None
 
 
 class WeighUpdate(OrmModel):
