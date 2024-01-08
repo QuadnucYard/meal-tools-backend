@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .base import OrmModel
+from .base import OrmModel, TimeMixin
 
 if TYPE_CHECKING:
     from app.schemas.food import FoodRead
@@ -20,7 +20,7 @@ class TagUpdate(TagBase):
     ...
 
 
-class TagRead(TagBase):
+class TagRead(TagBase, TimeMixin):
     id: int
 
 
