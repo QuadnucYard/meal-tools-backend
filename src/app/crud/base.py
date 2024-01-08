@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Generic, Sequence, Type, TypedDict, TypeVar
 
 from fastapi import HTTPException
+from fastapi.types import IncEx
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from fastapi_pagination.types import AsyncItemsTransformer
@@ -10,6 +11,7 @@ from pydantic import BaseModel
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.inspection import inspect
+from sqlalchemy.orm.interfaces import ORMOption
 
 from app.models.base import Base
 
@@ -38,15 +40,15 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    async def get(self, db: AsyncSession, id: Any) -> ModelType | None:
-        return await db.get(self.model, id)
+    async def get(self, db: AsyncSession, id: Any, *, options: Sequence[ORMOption] | None = None) -> ModelType | None:
+        return await db.get(self.model, id, options=options)
 
     async def get_if(self, db: AsyncSession, *where_clause) -> ModelType | None:
         stmt = select(self.model).where(*where_clause)
         return await db.scalar(stmt)
 
-    async def get_one(self, db: AsyncSession, id: Any) -> ModelType:
-        ret = await self.get(db, id)
+    async def get_one(self, db: AsyncSession, id: Any, *, options: Sequence[ORMOption] | None = None) -> ModelType:
+        ret = await self.get(db, id, options=options)
         if not ret:
             raise HTTPException(404, f"Not found {self.model.__name__} with id {id}")
         return ret
@@ -109,10 +111,19 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return await self.add(db, db_obj)
 
     async def update(
-        self, db: AsyncSession, *, db_obj: ModelType, obj_in: UpdateSchemaType | dict[str, Any]
+        self,
+        db: AsyncSession,
+        *,
+        db_obj: ModelType,
+        obj_in: UpdateSchemaType | dict[str, Any],
+        exclude: IncEx | None = None,
     ) -> ModelType:
         # obj_data = jsonable_encoder(db_obj)
-        update_data = obj_in if isinstance(obj_in, dict) else obj_in.model_dump(exclude_unset=True, exclude_none=True)
+        update_data = (
+            obj_in
+            if isinstance(obj_in, dict)
+            else obj_in.model_dump(exclude=exclude, exclude_unset=True, exclude_none=True)
+        )
         for field in update_data:
             if hasattr(db_obj, field):
                 setattr(db_obj, field, update_data[field])

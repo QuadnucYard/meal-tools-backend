@@ -1,10 +1,14 @@
 import json
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from .assoc import FoodTagLink
 from .base import Base, TimeMixin
+
+if TYPE_CHECKING:
+    from .tag import Tag
 
 
 class Food(TimeMixin, Base):
@@ -18,7 +22,7 @@ class Food(TimeMixin, Base):
 
     parent: Mapped[Optional["Food"]] = relationship("Food", back_populates="variants", remote_side=[id])
     variants: Mapped[list["Food"]] = relationship("Food", back_populates="parent")
-    # variants: Mapped[list["Food"]] = relationship("Food")
+    tags: Mapped[list["Tag"]] = relationship(secondary=FoodTagLink, back_populates="foods")
 
     @property
     def aliases(self) -> list[str]:
@@ -35,6 +39,3 @@ class Food(TimeMixin, Base):
     @images.setter
     def images(self, images: list[str]):
         self._images = json.dumps(images)
-
-
-__all__ = ["Food"]

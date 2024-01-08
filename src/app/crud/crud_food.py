@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.crud.base import CRUDBase
 from app.models.food import Food
@@ -8,6 +9,9 @@ from app.models.weigh import Weigh
 
 
 class CRUDFood(CRUDBase[Food, BaseModel, BaseModel]):
+    async def get_x(self, db: AsyncSession, id: int):
+        return await self.get(db, id, options=(joinedload(Food.tags), joinedload(Food.variants)))
+
     async def get_with_weight(self, db: AsyncSession):
         subq = (
             select(

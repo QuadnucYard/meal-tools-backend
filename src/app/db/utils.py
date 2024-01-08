@@ -1,8 +1,9 @@
 from typing import Any, Type, TypeVar, overload
 
 from pydantic import BaseModel
+from sqlalchemy.util import greenlet_spawn
 
-from app.db.session import AsyncEngine, AsyncSession
+from app.db.session import AsyncEngine
 from app.models.base import Base
 
 SchemaType = TypeVar("SchemaType", bound=BaseModel)
@@ -10,15 +11,14 @@ ModelType = TypeVar("ModelType", bound=Base)
 
 
 @overload
-async def from_orm_async(
-    db: AsyncSession, model: Type[SchemaType], obj: ModelType, update: dict[str, Any] | None = None
+async def model_validate_async(
+    model: Type[SchemaType], obj: ModelType, update: dict[str, Any] | None = None
 ) -> SchemaType:
     ...
 
 
 @overload
-async def from_orm_async(
-    db: AsyncSession,
+async def model_validate_async(
     model: Type[SchemaType],
     obj: list[ModelType],
     update: dict[str, Any] | None = None,
@@ -26,16 +26,15 @@ async def from_orm_async(
     ...
 
 
-async def from_orm_async(
-    db: AsyncSession,
+async def model_validate_async(
     model: Type[SchemaType],
     obj: ModelType | list[ModelType],
     update: dict[str, Any] | None = None,
 ) -> SchemaType | list[SchemaType]:
     if isinstance(obj, list):
-        return await db.run_sync(lambda _: [model.model_validate(obj_) for obj_ in obj])
+        return await greenlet_spawn(lambda: [model.model_validate(obj_) for obj_ in obj])
     else:
-        return await db.run_sync(lambda _: model.model_validate(obj))
+        return await greenlet_spawn(lambda: model.model_validate(obj))
 
 
 class no_echo:

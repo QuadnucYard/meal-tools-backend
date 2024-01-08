@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from .base import OrmModel, TimeMixin
 
+# if TYPE_CHECKING:
+from .tag import TagRead
+
 
 class FoodBase(OrmModel):
     parent_id: int | None = None
@@ -16,12 +19,22 @@ class FoodCreate(FoodBase):
     ...
 
 
+class FoodUpdate(OrmModel):
+    name: str | None = None
+    aliases: list[str] | None = None
+    price: int | None = None
+    desc: str | None = None
+    images: list[str] | None = None
+    tags: list[int] | None = None
+
+
 class FoodRead(FoodBase, TimeMixin):
     id: int
 
 
 class FoodReadWithVariants(FoodRead):
     variants: list[FoodReadWithVariants]
+    tags: list[TagRead]
 
 
 class FoodStats(OrmModel):
@@ -32,14 +45,6 @@ class FoodStats(OrmModel):
 
 class FoodReadWithStats(FoodReadWithVariants, FoodStats):
     ...
-
-
-class FoodUpdate(OrmModel):
-    name: str | None = None
-    aliases: list[str] | None = None
-    price: int | None = None
-    desc: str | None = None
-    images: list[str] | None = None
 
 
 __all__ = ["FoodCreate", "FoodRead", "FoodReadWithVariants", "FoodReadWithStats", "FoodUpdate"]

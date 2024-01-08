@@ -18,6 +18,3 @@ class Canteen(Base):
     @aliases.setter
     def aliases(self, aliases: list[str]):
         self._aliases = json.dumps(aliases, ensure_ascii=False)
-
-
-__all__ = ["Canteen"]

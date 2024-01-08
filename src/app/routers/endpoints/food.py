@@ -13,7 +13,14 @@ async def dep_get_food(
     food_id: int,
     db: AsyncSession = Depends(deps.get_db),
 ):
-    food = await crud.food.get(db, food_id)
+    return await crud.food.get_one(db, food_id)
+
+
+async def dep_get_food_x(
+    food_id: int,
+    db: AsyncSession = Depends(deps.get_db),
+):
+    food = await crud.food.get_x(db, food_id)
     if not food:
         raise HTTPException(404, "Can't find food!")
     return food
@@ -37,21 +44,31 @@ async def get_foods(
     )
 
 
-@router.post("/", response_model=FoodRead)
+@router.get("/{food_id}", response_model=FoodReadWithVariants)
+async def get_food(
+    food: Food = Depends(dep_get_food_x),
+):
+    return food
+
+
+@router.post("/", response_model=FoodReadWithVariants)
 async def add_food(
     body: FoodCreate,
     db: AsyncSession = Depends(deps.get_db),
 ):
-    return await crud.food.create(db, body)
+    food = await crud.food.create(db, body)
+    return await FoodReadWithVariants.model_validate_async(food)
 
 
-@router.put("/{food_id}", response_model=FoodRead)
+@router.put("/{food_id}", response_model=FoodReadWithVariants)
 async def update_food(
     body: FoodUpdate,
-    food: Food = Depends(dep_get_food),
+    food: Food = Depends(dep_get_food_x),
     db: AsyncSession = Depends(deps.get_db),
 ):
-    return await crud.food.update(db, db_obj=food, obj_in=body)
+    if body.tags:
+        food.tags = await crud.tag.get_ones(db, body.tags)
+    return await crud.food.update(db, db_obj=food, obj_in=body, exclude={"tags"})
 
 
 @router.get("/rec", response_model=list[FoodRead])
