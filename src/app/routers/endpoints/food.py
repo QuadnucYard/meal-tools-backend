@@ -44,6 +44,14 @@ async def get_foods(
     )
 
 
+@router.get("/rec", response_model=list[FoodRead])
+async def get_recommendations(
+    db: AsyncSession = Depends(deps.get_db),
+    limit: int = 10,
+):
+    return await crud.weigh.get_recent_foods(db, limit=limit)
+
+
 @router.get("/{food_id}", response_model=FoodReadWithVariants)
 async def get_food(
     food: Food = Depends(dep_get_food_x),
@@ -69,11 +77,3 @@ async def update_food(
     if body.tags:
         food.tags = await crud.tag.get_ones(db, body.tags)
     return await crud.food.update(db, db_obj=food, obj_in=body, exclude={"tags"})
-
-
-@router.get("/rec", response_model=list[FoodRead])
-async def get_recommendations(
-    db: AsyncSession = Depends(deps.get_db),
-    limit: int = 10,
-):
-    return await crud.weigh.get_recent_foods(db, limit=limit)
