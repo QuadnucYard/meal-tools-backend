@@ -31,17 +31,15 @@ async def get_foods(
     db: AsyncSession = Depends(deps.get_db),
 ):
     rows = await crud.food.get_with_weight(db)
-    return await db.run_sync(
-        lambda _: [
-            FoodReadWithStats(
-                **FoodReadWithVariants.model_validate(row[0]).model_dump(),
-                weight_cnt=row[1],
-                weight_avg=row[2],
-                weight_std=row[3],
-            )
-            for row in rows
-        ]
-    )
+    return [
+        FoodReadWithStats(
+            **FoodReadWithVariants.model_validate(row[0]).model_dump(),
+            weight_cnt=row[1],
+            weight_avg=row[2],
+            weight_std=row[3],
+        )
+        for row in rows
+    ]
 
 
 @router.get("/rec", response_model=list[FoodRead])

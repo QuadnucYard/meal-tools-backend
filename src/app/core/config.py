@@ -1,10 +1,12 @@
 import secrets
 
-from pydantic import validator
-from pydantic_settings import BaseSettings
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(case_sensitive=False)
+
     API_STR: str = "/api"
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
@@ -17,7 +19,7 @@ class Settings(BaseSettings):
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
     BACKEND_CORS_ORIGINS: list[str] = ["http://localhost:5173"]
 
-    @validator("BACKEND_CORS_ORIGINS", pre=True)
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     def assemble_cors_origins(cls, v: str | list[str]) -> str | list[str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
@@ -31,9 +33,6 @@ class Settings(BaseSettings):
 
     FIRST_SUPERUSER: str = "root"
     FIRST_SUPERUSER_PASSWORD: str = "root"
-
-    class Config:
-        case_sensitive = False
 
 
 settings = Settings()
