@@ -10,6 +10,8 @@ if TYPE_CHECKING:
 
 class TagBase(OrmModel):
     name: str
+    category: str | None
+    color: str
 
 
 class TagCreate(TagBase):
