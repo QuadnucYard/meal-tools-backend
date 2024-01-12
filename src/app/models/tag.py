@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+from sqlalchemy.ext.associationproxy import AssociationProxy, association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .assoc import FoodTagLink
@@ -16,3 +17,5 @@ class Tag(TimeMixin, Base):
     color: Mapped[str] = mapped_column(server_default="grey")
 
     foods: Mapped[list["Food"]] = relationship(secondary=FoodTagLink, back_populates="tags", lazy="raise")
+
+    food_ids: AssociationProxy[list[int]] = association_proxy("foods", "id")

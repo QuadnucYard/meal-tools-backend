@@ -1,9 +1,4 @@
-from __future__ import annotations
-
 from .base import OrmModel, TimeMixin
-
-# if TYPE_CHECKING:
-from .tag import TagRead
 
 
 class FoodBase(OrmModel):
@@ -32,8 +27,8 @@ class FoodRead(FoodBase, TimeMixin):
 
 
 class FoodReadWithVariants(FoodRead):
-    variants: list[FoodReadWithVariants]
-    tags: list[TagRead]
+    variant_ids: list[int]
+    tag_ids: list[int]
 
 
 class FoodStats(OrmModel):

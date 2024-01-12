@@ -2,6 +2,7 @@ import json
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import ForeignKey
+from sqlalchemy.ext.associationproxy import AssociationProxy, association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .assoc import FoodTagLink
@@ -23,6 +24,9 @@ class Food(TimeMixin, Base):
     parent: Mapped[Optional["Food"]] = relationship("Food", back_populates="variants", remote_side=[id])
     variants: Mapped[list["Food"]] = relationship("Food", back_populates="parent")
     tags: Mapped[list["Tag"]] = relationship(secondary=FoodTagLink, back_populates="foods")
+
+    variant_ids: AssociationProxy[list[int]] = association_proxy("variants", "id")
+    tag_ids: AssociationProxy[list[int]] = association_proxy("tags", "id")
 
     @property
     def aliases(self) -> list[str]:
