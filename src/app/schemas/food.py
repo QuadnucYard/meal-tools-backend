@@ -25,7 +25,6 @@ class FoodUpdate(OrmModel):
     price: int | None = None
     desc: str | None = None
     images: list[str] | None = None
-    tags: list[int] | None = None
 
 
 class FoodRead(FoodBase, TimeMixin):

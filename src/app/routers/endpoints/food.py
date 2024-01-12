@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -72,6 +74,15 @@ async def update_food(
     food: Food = Depends(dep_get_food_x),
     db: AsyncSession = Depends(deps.get_db),
 ):
-    if body.tags:
-        food.tags = await crud.tag.get_ones(db, body.tags)
-    return await crud.food.update(db, db_obj=food, obj_in=body, exclude={"tags"})
+    return await crud.food.update(db, db_obj=food, obj_in=body)
+
+
+@router.put("/{food_id}/tags", response_model=FoodReadWithVariants)
+async def update_food_tags(
+    tags: list[int],
+    food: Food = Depends(dep_get_food_x),
+    db: AsyncSession = Depends(deps.get_db),
+):
+    food.tags = await crud.tag.get_ones(db, tags)
+    food.update_time = datetime.utcnow()
+    return await crud.food.add(db, food)
