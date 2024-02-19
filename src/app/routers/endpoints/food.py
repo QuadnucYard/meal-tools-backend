@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import crud
 from app.models.food import Food
 from app.routers import deps
-from app.schemas.food import FoodCreate, FoodRead, FoodReadWithStats, FoodReadWithVariants, FoodUpdate
+from app.schemas.food import FoodCreate, FoodReadWithStats, FoodReadWithVariants, FoodUpdate
 
 router = APIRouter()
 
@@ -44,7 +44,7 @@ async def get_foods(
     ]
 
 
-@router.get("/rec", response_model=list[FoodRead])
+@router.get("/rec", response_model=list[int])
 async def get_recommendations(
     db: AsyncSession = Depends(deps.get_db),
     limit: int = 10,

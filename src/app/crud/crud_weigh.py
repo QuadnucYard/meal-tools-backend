@@ -11,7 +11,7 @@ class CRUDWeigh(CRUDBase[Weigh, BaseModel, BaseModel]):
     async def get_recent_foods(self, db: AsyncSession, limit: int):
         # 按照最晚一次登记顺序
         stmt = (
-            select(Food)
+            select(Food.id)
             .order_by(select(func.max(Weigh.create_time)).where(Weigh.food_id == Food.id).as_scalar().desc())
             .limit(limit)
         )
