@@ -77,6 +77,14 @@ async def update_food(
     return await crud.food.update(db, db_obj=food, obj_in=body)
 
 
+@router.delete("/{food_id}", response_model=FoodReadWithVariants)
+async def delete_food(
+    food: Food = Depends(dep_get_food_x),
+    db: AsyncSession = Depends(deps.get_db),
+):
+    return await crud.food.delete(db, db_obj=food)
+
+
 @router.put("/{food_id}/tags", response_model=FoodReadWithVariants)
 async def update_food_tags(
     tags: list[int],
