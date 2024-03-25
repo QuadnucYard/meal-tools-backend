@@ -26,8 +26,13 @@ class CRUDFood(CRUDBase[Food, BaseModel, BaseModel]):
             .subquery()
         )
         stmt = (
-            select(Food, subq.c.weight_cnt, subq.c.weight_avg, subq.c.weight_std)
-            .join_from(Food, subq)
+            select(
+                Food,
+                func.ifnull(subq.c.weight_cnt, 0),
+                func.ifnull(subq.c.weight_avg, 0),
+                func.ifnull(subq.c.weight_std, 0),
+            )
+            .join_from(Food, subq, isouter=True)
             .options(subqueryload(Food.tags), subqueryload(Food.variants))
         )
         return list((await db.execute(stmt)).all())
