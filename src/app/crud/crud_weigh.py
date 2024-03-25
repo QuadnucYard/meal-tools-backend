@@ -17,5 +17,9 @@ class CRUDWeigh(CRUDBase[Weigh, BaseModel, BaseModel]):
         )
         return (await db.execute(stmt)).scalars()
 
+    async def get_food_rc(self, db: AsyncSession, food_id: int):
+        stmt = select(func.count()).select_from(Weigh).where(Weigh.food_id == food_id)
+        return (await db.execute(stmt)).scalar_one()
+
 
 weigh = CRUDWeigh(Weigh)

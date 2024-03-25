@@ -96,3 +96,11 @@ async def update_food_tags(
     food.tags = await crud.tag.get_ones(db, tags)
     food.update_time = datetime.now(timezone.utc)
     return await crud.food.add(db, food)
+
+
+@router.get("/{food_id}/rc")
+async def get_food_rc(
+    food_id: int,
+    db: AsyncSession = Depends(deps.get_db),
+):
+    return await crud.weigh.get_food_rc(db, food_id=food_id)
