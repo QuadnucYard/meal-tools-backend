@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -64,7 +64,9 @@ async def add_food(
     body: FoodCreate,
     db: AsyncSession = Depends(deps.get_db),
 ):
-    food = await crud.food.create(db, body)
+    food = await crud.food.add(
+        db, Food(**body.model_dump(exclude={"tag_ids"}), tags=await crud.tag.get_ones(db, body.tag_ids))
+    )
     return await FoodReadWithVariants.model_validate_async(food)
 
 
@@ -92,5 +94,5 @@ async def update_food_tags(
     db: AsyncSession = Depends(deps.get_db),
 ):
     food.tags = await crud.tag.get_ones(db, tags)
-    food.update_time = datetime.utcnow()
+    food.update_time = datetime.now(timezone.utc)
     return await crud.food.add(db, food)

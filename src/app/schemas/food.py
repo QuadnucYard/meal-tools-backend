@@ -11,7 +11,7 @@ class FoodBase(OrmModel):
 
 
 class FoodCreate(FoodBase):
-    ...
+    tag_ids: list[int]
 
 
 class FoodUpdate(OrmModel):

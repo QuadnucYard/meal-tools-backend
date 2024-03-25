@@ -1,8 +1,10 @@
+from typing import Final
+
 from sqlalchemy import Column, ForeignKey, Table
 
 from .base import Base
 
-FoodTagLink = Table(
+FoodTagLink: Final[Table] = Table(
     "food_tag_link",
     Base.metadata,
     Column("food_id", ForeignKey("food.id"), primary_key=True),
